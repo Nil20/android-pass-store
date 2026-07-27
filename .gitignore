@@ -16,3 +16,7 @@ claude.local.md
 keystore.properties
 *.keystore
 *.jks
+
+# Release artifacts staged at the repo root for upload
+/*.apk
+/*.apk.sha256
