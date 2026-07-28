@@ -45,6 +45,101 @@ class PassStoreImplTest {
     }
 
     @Test
+    fun `buildIndex recognizes a Card Entry beneath organizational directories`() {
+        createGpgFile("finance/cards/visa/my-card.gpg")
+
+        val entry = store.buildIndex().single()
+
+        assertTrue(entry.isCard)
+        assertEquals("visa", entry.domain)
+        assertEquals("my-card", entry.username)
+    }
+
+    @Test
+    fun `buildIndex recognizes credit-cards marker beneath organizational directories`() {
+        createGpgFile("finance/credit-cards/mastercard/travel.gpg")
+
+        val entry = store.buildIndex().single()
+
+        assertTrue(entry.isCard)
+        assertEquals("mastercard", entry.domain)
+        assertEquals("travel", entry.username)
+    }
+
+    @Test
+    fun `buildIndex treats card markers as case-sensitive`() {
+        createGpgFile("finance/Cards/visa/my-card.gpg")
+
+        val entry = store.buildIndex().single()
+
+        assertTrue(!entry.isCard)
+        assertEquals("visa", entry.domain)
+        assertEquals("my-card", entry.username)
+    }
+
+    @Test
+    fun `buildIndex discards organization after a nested card marker`() {
+        createGpgFile("finance/cards/personal/visa/my-card.gpg")
+
+        val entry = store.buildIndex().single()
+
+        assertTrue(entry.isCard)
+        assertEquals("visa", entry.domain)
+        assertEquals("my-card", entry.username)
+    }
+
+    @Test
+    fun `buildIndex continues to recognize root card marker`() {
+        createGpgFile("cards/visa/my-card.gpg")
+
+        val entry = store.buildIndex().single()
+
+        assertTrue(entry.isCard)
+        assertEquals("visa", entry.domain)
+        assertEquals("my-card", entry.username)
+    }
+
+    @Test
+    fun `buildIndex uses the first card marker`() {
+        createGpgFile("cards/personal/credit-cards/my-card.gpg")
+
+        val entry = store.buildIndex().single()
+
+        assertTrue(entry.isCard)
+        assertEquals("credit-cards", entry.domain)
+    }
+
+    @Test
+    fun `buildIndex reserves card marker names at every depth`() {
+        createGpgFile("clients/cards/alice.gpg")
+
+        val entry = store.buildIndex().single()
+
+        assertTrue(entry.isCard)
+        assertNull(entry.domain)
+    }
+
+    @Test
+    fun `buildIndex requires an exact card marker segment`() {
+        createGpgFile("finance/giftcards/visa/my-card.gpg")
+
+        val entry = store.buildIndex().single()
+
+        assertTrue(!entry.isCard)
+    }
+
+    @Test
+    fun `buildIndex preserves null domain for card directly beneath root marker`() {
+        createGpgFile("cards/my-card.gpg")
+
+        val entry = store.buildIndex().single()
+
+        assertTrue(entry.isCard)
+        assertNull(entry.domain)
+        assertEquals("my-card", entry.username)
+    }
+
+    @Test
     fun `buildIndex handles one-level path with null domain`() {
         createGpgFile("github.com.gpg")
         val entries = store.buildIndex()

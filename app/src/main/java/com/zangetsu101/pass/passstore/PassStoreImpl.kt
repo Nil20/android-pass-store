@@ -82,8 +82,10 @@ class PassStoreImpl
             file: File,
         ): PassEntry {
             val pathNoExt = relativePath.removeSuffix(".gpg")
-            val isCard = pathNoExt.startsWith("cards/") || pathNoExt.startsWith("credit-cards/")
-            val parts = pathNoExt.split("/").let { if (isCard) it.drop(1) else it }
+            val pathParts = pathNoExt.split("/")
+            val cardMarkerIndex = pathParts.dropLast(1).indexOfFirst { it == "cards" || it == "credit-cards" }
+            val isCard = cardMarkerIndex >= 0
+            val parts = if (isCard) pathParts.drop(cardMarkerIndex + 1) else pathParts
             return when {
                 parts.size >= 2 -> {
                     PassEntry(

@@ -48,7 +48,7 @@ Given a package name:
 
 ## Card Entries
 
-Card entries are detected at index time by top-level path prefix (`cards/` or `credit-cards/`) and marked with `isCard = true`. Card forms do not use domain matching; all indexed card entries are candidate card fills.
+Card entries are detected at index time by the first exact lowercase `cards` or `credit-cards` directory segment at any path depth and marked with `isCard = true`. Card forms do not use domain matching; all indexed card entries are candidate card fills.
 
 ## Interfaces
 

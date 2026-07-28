@@ -23,11 +23,13 @@ github.com/alice.gpg          → domain=github.com  username=alice
 web/github.com/alice.gpg      → domain=github.com  username=alice
 ```
 
-For **Card Entries**, the leading `cards/` or `credit-cards/` segment is stripped first, then the same rule applies:
+For **Card Entries**, the first directory segment named exactly the lowercase `cards` or `credit-cards`, and every segment before it, are stripped first. The same rule then applies:
 
 ```
-cards/visa/my-card.gpg        → domain=visa        username=my-card
-cards/my-card.gpg             → domain=null         username=my-card
+cards/visa/my-card.gpg                → domain=visa        username=my-card
+cards/my-card.gpg                     → domain=null         username=my-card
+finance/cards/visa/my-card.gpg        → domain=visa        username=my-card
+finance/cards/my-card.gpg             → domain=null         username=my-card
 ```
 
 **`domain` semantics differ by entry type:**
@@ -91,7 +93,7 @@ Relationships:
 
 ## Card Entry
 
-A **Card Entry** is a pass entry stored under the `cards/` or `credit-cards/` top-level directory. It is detected at index time from the file path — no decryption required.
+A **Card Entry** is a pass entry whose path contains a directory segment named exactly the lowercase `cards` or `credit-cards`; that segment marks the root of the card subtree. It is detected at index time from the file path — no decryption required.
 
 **File format:**
 
