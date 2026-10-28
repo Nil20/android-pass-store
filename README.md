@@ -66,14 +66,31 @@ Design principles the app is judged against:
 ### Prerequisites
 
 - JDK 17+ (CI uses 21)
-- Android SDK with `platforms;android-37.0` and `platform-tools`, pointed to by `sdk.dir` in a gitignored `local.properties`
-- A device: a USB-debugging phone, or an emulator (`emulator` + a `system-images;android-36;google_apis;x86_64` image)
+- [Android CLI](https://developer.android.com/tools/agents/android-cli/download) (`android`)
+- A device: a USB-debugging phone, or an emulator (x86_64 emulators need [hardware acceleration](https://developer.android.com/studio/run/emulator-acceleration))
+
+```bash
+android sdk install platforms/android-37.0 platform-tools
+echo "sdk.dir=$(android info sdk)" > local.properties   # gitignored; Gradle doesn't find the SDK on its own
+android emulator create                 # one-time: downloads the emulator + system image, creates AVD "medium_phone"
+android emulator start medium_phone     # returns once booted; skip if you're using a phone
+android run :app                        # build, install and launch the debug build
+```
+
+On Windows, write `sdk.dir` with forward slashes (`C:/Users/...`). Backslashes are escape characters in `.properties` files.
+
+<details>
+<summary>Without the Android CLI</summary>
+
+Install `platforms;android-37.0`, `platform-tools`, `emulator` and a system image (e.g. `system-images;android-36;google_apis;x86_64`) with `sdkmanager` or Android Studio, then:
 
 ```bash
 echo "sdk.dir=$HOME/Android/Sdk" > local.properties
 emulator -avd <your-avd> &      # or plug in a phone
 ./gradlew installDebug          # build + install on the connected device
 ```
+
+</details>
 
 ### Debug builds use a fixed SSH key
 
